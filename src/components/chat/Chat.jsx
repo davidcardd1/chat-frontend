@@ -3,7 +3,6 @@ import { makeStyles } from "@mui/styles";
 import {
   Paper,
   Grid,
-  Box,
   Divider,
   TextField,
   Typography,
@@ -19,14 +18,13 @@ import {
   Button,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { over } from "stompjs";
-import SockJS from "sockjs-client";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { useGetUserDetailsQuery } from "../../features/user/userService";
 import { logout, setCredentials } from "../../features/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import UsersList from "../usersList/UsersList";
+import MessageList from "../messageList/MessageList";
 
 const useStyles = makeStyles({
   table: {
@@ -49,14 +47,12 @@ const useStyles = makeStyles({
   },
 });
 
-let stompClient = null;
-
 const Chat = () => {
   const classes = useStyles();
 
   const [status, setStatus] = useState(false);
+  const [selectedUser, setSelectedUser] = useState("");
 
-  const { roomInfo } = useSelector((state) => state.room);
   const { userInfo } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const { data } = useGetUserDetailsQuery(userInfo.id);
@@ -65,7 +61,7 @@ const Chat = () => {
   useEffect(() => {
     if (data) dispatch(setCredentials(data));
     console.log(data, userInfo);
-  }, [data, dispatch]);
+  }, [data, dispatch, userInfo]);
 
   const onSwitchChange = (event) => {
     setStatus(event.target.checked);
@@ -76,15 +72,19 @@ const Chat = () => {
     navigate("/ ");
   };
 
+  useEffect(() => {
+    console.log(selectedUser);
+  }, [selectedUser]);
+
   return (
     <div style={{ width: "90%" }}>
       <Grid container sx={{ flexDirection: "row" }}>
-        <Grid item xs={12}>
+        <Grid item xs={6} sx={{ display: "flex" }}>
           <Typography variant="h5" className="header-message">
             Chat
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={6} sx={{ display: "flex", justifyContent: "end" }}>
           <Button onClick={handleLogout}>
             <Typography variant="h5" className="header-message">
               Logout
@@ -136,181 +136,11 @@ const Chat = () => {
             </List>
           </Grid>
           <Divider />
-          <List sx={{ height: "60vh", overflowY: "scroll" }}>
-            <UsersList />
-          </List>
+          <UsersList setSelectedUser={setSelectedUser} />
         </Grid>
         <Grid item xs={9}>
           <List className={classes.messageArea}>
-            <ListItem key="1">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Hey man, What's up ?"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="09:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="2">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="left"
-                    primary="Hey, Iam Good! What about you ?"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="left" secondary="09:31"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
-            <ListItem key="3">
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText
-                    align="right"
-                    primary="Cool. i am good, let's catch up!"
-                  ></ListItemText>
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText align="right" secondary="10:30"></ListItemText>
-                </Grid>
-              </Grid>
-            </ListItem>
+            <MessageList user={selectedUser} />
           </List>
           <Divider />
           <Grid container style={{ padding: "20px" }}>

@@ -1,9 +1,7 @@
-import { List, ListItem } from "@mui/material";
 import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import Chat from "../components/chat/Chat";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetRoomDetailsQuery } from "../features/room/roomService";
 import { setRoomCredentials } from "../features/room/roomSlice";
 import { EntryRoom } from "./EntryRoom";

@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Badge,
+} from "@mui/material";
+import MailIcon from "@mui/icons-material/Mail";
 import { useSelector } from "react-redux";
-import { ListItem, ListItemText } from "@mui/material";
+import axios from "axios";
 
-export default function UsersList() {
+const UsersList = ({ setSelectedUser }) => {
+  const [users, setUsers] = useState([]);
+  const [messages, setMessages] = useState([]);
   const baseURL = "http://localhost:9090";
-  const [users, setUsers] = useState({});
   const { userInfo } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -17,24 +25,35 @@ export default function UsersList() {
         },
       })
       .then((res) => {
-        console.log(res.data);
-        setUsers(res.data);
+        //console.log(res.data);
+        setUsers([...Object.entries(res.data)]);
         console.log(users);
       });
   }, [userInfo]);
 
-  const printUsers = () => {
-    Object.keys(users).forEach((key) => {
-      console.log(key, users[key]);
-      <ListItem button key={key}>
-        <ListItemText primary={`${key}`}>key</ListItemText>
-        <ListItemText
-          secondary={users[key] ? "online" : "offline"}
-          align="right"
-        ></ListItemText>
-      </ListItem>;
-    });
+  const selectUser = (event) => {
+    setSelectedUser(event.target.firstChild.data);
   };
 
-  return <div>{printUsers()}</div>;
-}
+  return (
+    <List sx={{ height: "30vw", overflowY: "auto" }}>
+      {users.length > 0 &&
+        users.map((item) => (
+          <ListItem button key={item} onClick={selectUser}>
+            <ListItemIcon>
+              <Badge badgeContent={4} color="primary">
+                <MailIcon color="action" />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText primary={item[0]}>{item[0]}</ListItemText>
+            <ListItemText
+              secondary={item[1] ? "online" : "offline"}
+              align="end"
+            ></ListItemText>
+          </ListItem>
+        ))}
+    </List>
+  );
+};
+
+export default UsersList;
