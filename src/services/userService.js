@@ -36,6 +36,16 @@ export const userApi = createApi({
         };
       },
     }),
+    getUsers: builder.query({
+      query: (args) => {
+        const { roomID, sessionID } = args;
+        return {
+          url: `/${roomID}/users`,
+          method: "GET",
+          params: { sessionID },
+        };
+      },
+    }),
   }),
 });
 
@@ -45,4 +55,5 @@ export const {
   useGetUserDetailsQuery,
   useGetRoomDetailsQuery,
   useGetMessagesQuery,
+  useGetUsersQuery,
 } = userApi;

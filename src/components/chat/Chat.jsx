@@ -55,7 +55,7 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState("");
 
   const { userInfo } = useSelector((state) => state.user);
-  const { data: userData } = useGetUserDetailsQuery(userInfo.id);
+  const { data: userData } = useGetUserDetailsQuery(userInfo.sessionID);
 
   useEffect(() => {
     if (userData) dispatch(setCredentials(userData));
@@ -107,7 +107,7 @@ const Chat = () => {
                 />
               </ListItemIcon>
               <ListItemText
-                primary={`Chat room: ${userInfo.room.name}`}
+                primary={`Chat room: ${userInfo.room.name || " "}`}
               ></ListItemText>
             </ListItem>
           </List>
@@ -121,10 +121,7 @@ const Chat = () => {
                 <FormGroup>
                   <FormControlLabel
                     control={
-                      <Switch
-                        checked={status}
-                        onChange={() => onSwitchChange}
-                      />
+                      <Switch checked={status} onChange={onSwitchChange} />
                     }
                     label={status ? "online" : "offline"}
                     labelPlacement="top"

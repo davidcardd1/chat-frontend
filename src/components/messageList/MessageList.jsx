@@ -33,15 +33,15 @@ const MessageList = ({ user }) => {
   }, [user, messages]);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:9090/messages/${user}`, {
-        params: { sessionID: userInfo.sessionID },
-      })
-      .then((res) => {
-        dispatch(setMessages(res.data));
-      });
+    // axios
+    //   .get(`http://localhost:9090/messages/${user}`, {
+    //     params: { sessionID: userInfo.sessionID },
+    //   })
+    //   .then((res) => {
+    //     dispatch(setMessages(res.data));
+    //   });
     if (messagesData) dispatch(setMessages(messagesData));
-  }, [dispatch, user]);
+  }, [dispatch, messagesData]);
 
   return user ? (
     <>

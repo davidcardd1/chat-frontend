@@ -6,6 +6,7 @@ import { over } from "stompjs";
 import SockJS from "sockjs-client";
 import { useState, useEffect } from "react";
 import { addMessage } from "../../features/messages/messagesSlice";
+import { addUnread } from "../../features/users/usersSlice";
 
 let stompClient;
 function SendMessage({ receiver }) {
@@ -55,6 +56,7 @@ function SendMessage({ receiver }) {
       if (msg.sender !== userInfo.nickname) {
         console.log("RECEIVED: ", msg);
         dispatch(addMessage(msg));
+        dispatch(addUnread(msg.sender));
       }
     };
 
