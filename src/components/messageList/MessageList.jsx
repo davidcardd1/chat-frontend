@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useRef } from "react";
+import { resetUnreads } from "../../features/users/usersSlice";
 
 const MessageList = ({ user }) => {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ const MessageList = ({ user }) => {
 
   useEffect(() => {
     scrollToBottom();
+    dispatch(resetUnreads(user));
   }, [user, messages]);
 
   useEffect(() => {

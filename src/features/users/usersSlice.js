@@ -10,7 +10,7 @@ export const usersSlice = createSlice({
   reducers: {
     setUsers: (state, { payload }) => {
       payload.forEach((element) => {
-        element.push(0);
+        element.push(0); // TODO: bring number from database
         state.users.push(element);
       });
     },
@@ -22,9 +22,17 @@ export const usersSlice = createSlice({
         }
       });
     },
+    resetUnreads: (state, { payload }) => {
+      state.users.map((user) => {
+        if (user[0] == payload) {
+          console.log("RESET UNREAD HERE", user, payload);
+          user[2] = 0;
+        }
+      });
+    },
   },
   extraReducers: {},
 });
 
-export const { setUsers, addUnread } = usersSlice.actions;
+export const { setUsers, addUnread, resetUnreads } = usersSlice.actions;
 export default usersSlice.reducer;
