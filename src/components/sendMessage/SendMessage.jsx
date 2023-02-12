@@ -13,23 +13,9 @@ function SendMessage({ receiver }) {
   const { userInfo } = useSelector((state) => state.user);
   const [text, setText] = useState("");
 
-  const connect = () => {
-    let Sock = new SockJS("http://localhost:9090/chat");
-    stompClient = over(Sock);
-    stompClient.connect({}, onConnected, onError);
-  };
-
-  const onConnected = () => {
-    //setUserData({ ...userData, connected: true });
-    //stompClient.subscribe("/chatroom/public", onMessageReceived);
-    stompClient.subscribe(
-      "/user/messages/" + userInfo.nickname,
-      onPrivateMessage
-    );
-  };
-
-  const onError = (err) => {
-    console.log(err);
+  const handleText = (event) => {
+    event.preventDefault();
+    setText(event.target.value);
   };
 
   const sendMessage = () => {
@@ -44,22 +30,36 @@ function SendMessage({ receiver }) {
     dispatch(addMessage(JSON.parse(msg)));
   };
 
-  const handleText = (event) => {
-    event.preventDefault();
-    setText(event.target.value);
-  };
-
-  const onPrivateMessage = (payload) => {
-    let msg = JSON.parse(payload.body);
-    if (msg.sender !== userInfo.nickname) {
-      console.log("RECEIVED: ", msg);
-      //dispatch(addMessage(msg));
-    }
-  };
-
   useEffect(() => {
-    connect();
-  }, [receiver]);
+    const connect = () => {
+      let Sock = new SockJS("http://localhost:9090/chat");
+      stompClient = over(Sock);
+      stompClient.connect({}, onConnected, onError);
+    };
+
+    const onConnected = () => {
+      //setUserData({ ...userData, connected: true });
+      //stompClient.subscribe("/chatroom/public", onMessageReceived);
+      stompClient.subscribe(
+        "/user/messages/" + userInfo.nickname,
+        onPrivateMessage
+      );
+    };
+
+    const onError = (err) => {
+      console.log(err);
+    };
+
+    const onPrivateMessage = (payload) => {
+      let msg = JSON.parse(payload.body);
+      if (msg.sender !== userInfo.nickname) {
+        console.log("RECEIVED: ", msg);
+        dispatch(addMessage(msg));
+      }
+    };
+
+    if (stompClient == null) connect();
+  }, [receiver, userInfo.nickname]);
 
   return (
     <Grid container style={{ padding: "20px" }}>
