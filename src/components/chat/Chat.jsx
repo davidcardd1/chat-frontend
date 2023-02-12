@@ -4,27 +4,26 @@ import {
   Paper,
   Grid,
   Divider,
-  TextField,
   Typography,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Avatar,
-  Fab,
   Switch,
   FormGroup,
   FormControlLabel,
   Button,
 } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
-import { useGetUserDetailsQuery } from "../../features/user/userService";
+import { useGetUserDetailsQuery } from "../../services/userService";
 import { logout, setCredentials } from "../../features/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import UsersList from "../usersList/UsersList";
 import MessageList from "../messageList/MessageList";
+import { Box } from "@mui/system";
+import SendMessage from "../sendMessage/SendMessage";
 
 const useStyles = makeStyles({
   table: {
@@ -42,28 +41,28 @@ const useStyles = makeStyles({
     height: "100%",
   },
   messageArea: {
-    height: "70vh",
+    height: "60vh",
     overflowY: "auto",
   },
 });
 
 const Chat = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [status, setStatus] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
 
   const { userInfo } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
-  const { data } = useGetUserDetailsQuery(userInfo.id);
-  const navigate = useNavigate();
+  const { data: userData } = useGetUserDetailsQuery(userInfo.id);
 
   useEffect(() => {
-    if (data) dispatch(setCredentials(data));
-    console.log(data, userInfo);
-  }, [data, dispatch, userInfo]);
+    if (userData) dispatch(setCredentials(userData));
+  }, [userData, dispatch]);
 
   const onSwitchChange = (event) => {
+    event.preventDefault();
     setStatus(event.target.checked);
   };
 
@@ -123,9 +122,8 @@ const Chat = () => {
                   <FormControlLabel
                     control={
                       <Switch
-                        defaultChecked
                         checked={status}
-                        onChange={onSwitchChange}
+                        onChange={() => onSwitchChange}
                       />
                     }
                     label={status ? "online" : "offline"}
@@ -139,24 +137,15 @@ const Chat = () => {
           <UsersList setSelectedUser={setSelectedUser} />
         </Grid>
         <Grid item xs={9}>
+          <Box>
+            <Typography variant="h3">- {selectedUser} -</Typography>
+          </Box>
+          <Divider />
           <List className={classes.messageArea}>
             <MessageList user={selectedUser} />
           </List>
           <Divider />
-          <Grid container style={{ padding: "20px" }}>
-            <Grid item xs={11}>
-              <TextField
-                id="outlined-basic-email"
-                label="Type Something"
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={1} align="right">
-              <Fab color="primary" aria-label="add">
-                <SendIcon />
-              </Fab>
-            </Grid>
-          </Grid>
+          <SendMessage receiver={selectedUser} />
         </Grid>
       </Grid>
     </div>

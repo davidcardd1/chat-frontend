@@ -3,14 +3,19 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const backendURL = "http://localhost:9090";
 
-export const registerRoom = createAsyncThunk(
-  "room/new",
-  async (roomName, { rejectWithValue }) => {
+export const sendMessage = createAsyncThunk(
+  "messages/new",
+  async ({ sender, receiver, body }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(
-        `${backendURL}/chatroom/new` + "?roomName=" + roomName
+      stompClient.send(
+        "/app/chat/" + receiver,
+        {},
+        JSON.stringify({
+          body: body,
+          sender: sender,
+          receiver: receiver,
+        })
       );
-      return data;
     } catch (error) {
       // return custom error message from backend if present
       if (error.response && error.response.data.message) {
@@ -21,5 +26,3 @@ export const registerRoom = createAsyncThunk(
     }
   }
 );
-
-export const getRoom = createAsyncThunk();

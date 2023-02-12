@@ -20,9 +20,29 @@ export const userApi = createApi({
         method: "GET",
       }),
     }),
+    getRoomDetails: builder.query({
+      query: (roomID) => ({
+        url: `/chatroom?roomID=${roomID}`,
+        method: "GET",
+      }),
+    }),
+    getMessages: builder.query({
+      query: (args) => {
+        const { user, sessionID } = args;
+        return {
+          url: `/messages/${user}`,
+          method: "GET",
+          params: { sessionID },
+        };
+      },
+    }),
   }),
 });
 
 // export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetUserDetailsQuery } = userApi;
+export const {
+  useGetUserDetailsQuery,
+  useGetRoomDetailsQuery,
+  useGetMessagesQuery,
+} = userApi;

@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetRoomDetailsQuery } from "../features/room/roomService";
+import { useGetRoomDetailsQuery } from "../services/userService";
 import { setRoomCredentials } from "../features/room/roomSlice";
 import { EntryRoom } from "./EntryRoom";
 import { NotFound } from "./NotFound";

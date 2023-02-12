@@ -12,7 +12,6 @@ import axios from "axios";
 
 const UsersList = ({ setSelectedUser }) => {
   const [users, setUsers] = useState([]);
-  const [messages, setMessages] = useState([]);
   const baseURL = "http://localhost:9090";
   const { userInfo } = useSelector((state) => state.user);
 
@@ -27,12 +26,17 @@ const UsersList = ({ setSelectedUser }) => {
       .then((res) => {
         //console.log(res.data);
         setUsers([...Object.entries(res.data)]);
-        console.log(users);
       });
   }, [userInfo]);
 
   const selectUser = (event) => {
-    setSelectedUser(event.target.firstChild.data);
+    event.preventDefault();
+    if (
+      event.target.firstChild.data !== "online" &&
+      event.target.firstChild.data !== "offline"
+    ) {
+      setSelectedUser(event.target.firstChild.data);
+    }
   };
 
   return (

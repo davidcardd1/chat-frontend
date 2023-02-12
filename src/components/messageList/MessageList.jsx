@@ -1,34 +1,99 @@
-import { makeStyles } from "@mui/styles";
-import React from "react";
-import { Grid, List, ListItem, ListItemText, Typography } from "@mui/material";
-import { Container } from "@mui/system";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useGetMessagesQuery } from "../../services/userService";
+import { setMessages } from "../../features/messages/messagesSlice";
+import {
+  Grid,
+  ListItem,
+  ListItemText,
+  Typography,
+  Container,
+} from "@mui/material";
+import axios from "axios";
+import { useRef } from "react";
 
 const MessageList = ({ user }) => {
+  const dispatch = useDispatch();
+
+  const { userInfo } = useSelector((state) => state.user);
+  const { messages } = useSelector((state) => state.messages);
+  const { data: messagesData } = useGetMessagesQuery({
+    user: user,
+    sessionID: userInfo.sessionID,
+  });
+
+  const scrollBottomRef = useRef(null);
+
+  const scrollToBottom = () => {
+    scrollBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [user, messages]);
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:9090/messages/${user}`, {
+        params: { sessionID: userInfo.sessionID },
+      })
+      .then((res) => {
+        dispatch(setMessages(res.data));
+      });
+    if (messagesData) dispatch(setMessages(messagesData));
+  }, [dispatch, user]);
+
   return user ? (
     <>
-      <ListItem key="1">
-        <Grid container>
-          <Grid item xs={12}>
-            <ListItemText
-              align="right"
-              primary="Hey man, What's up ?"
-            ></ListItemText>
-          </Grid>
-          <Grid item xs={12}>
-            <ListItemText align="right" secondary="09:30"></ListItemText>
-          </Grid>
-        </Grid>
-      </ListItem>
-      <ListItem key="2">
-        <Grid container>
-          <Grid item xs={12}>
-            <ListItemText align="left" primary={user}></ListItemText>
-          </Grid>
-          <Grid item xs={12}>
-            <ListItemText align="left" secondary="09:31"></ListItemText>
-          </Grid>
-        </Grid>
-      </ListItem>
+      {messages.length > 0 ? (
+        <>
+          {messages.map((message) => (
+            <ListItem key={message.timeSent} xs={6}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <ListItemText
+                    align={
+                      message.sender === userInfo.nickname ||
+                      message.sender === userInfo.sessionID
+                        ? "right"
+                        : "left"
+                    }
+                    primary={message.body}
+                  ></ListItemText>
+                </Grid>
+                <Grid item xs={12}>
+                  <ListItemText
+                    align={
+                      message.sender === userInfo.nickname ||
+                      message.sender === userInfo.sessionID
+                        ? "right"
+                        : "left"
+                    }
+                    secondary={
+                      new Date(message.timeSent).getHours() +
+                      ":" +
+                      new Date(message.timeSent).getMinutes()
+                    }
+                  ></ListItemText>
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
+          <div ref={scrollBottomRef} />
+        </>
+      ) : (
+        <Container
+          sx={{
+            display: "flex",
+            height: "100%",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6">No messages...</Typography>
+        </Container>
+      )}
     </>
   ) : (
     <Container

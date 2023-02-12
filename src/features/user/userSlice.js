@@ -9,6 +9,7 @@ const initialState = {
   userInfo: {},
   userToken,
   error: null,
+  stompClient: null,
 };
 
 export const userSlice = createSlice({
