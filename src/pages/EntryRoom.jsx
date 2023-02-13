@@ -9,14 +9,22 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import { registerUser, userLogin } from "../features/user/userActions";
+import { useCookies } from "react-cookie";
+import Cookies from "universal-cookie";
 
 export const EntryRoom = () => {
+  const [cookies, setCookie] = useCookies(["userSession"]);
+  const cookiess = new Cookies();
   const { roomInfo } = useSelector((state) => state.room);
   const { userInfo, success, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const [userName, setUserName] = useState("");
   const [sessionID, setSessionID] = useState("");
+
+  const timestamp = new Date().getTime();
+  const expiration = timestamp + 60 * 60 * 24 * 1000;
+  const expireDate = new Date(expiration);
 
   const navigate = useNavigate();
 
@@ -33,6 +41,10 @@ export const EntryRoom = () => {
     const data = new FormData(event.currentTarget);
 
     dispatch(userLogin(data.get("sessionID")));
+    setCookie("userSession", data.get("sessionID"), {
+      path: "/",
+      maxAge: 86400,
+    });
   };
 
   useEffect(() => {
@@ -48,7 +60,7 @@ export const EntryRoom = () => {
 
   useEffect(() => {
     //console.log(userInfo);
-    if (userInfo.sessionID) {
+    if (userInfo.sessionID || cookies.sessionID) {
       navigate("user");
     }
   }, [navigate, userInfo]);

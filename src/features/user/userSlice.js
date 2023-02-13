@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { registerUser, userLogin, userStatus } from "./userActions";
+import { Cookies } from "react-cookie";
 
-const userToken = localStorage.getItem("userToken")
-  ? localStorage.getItem("userToken")
+const cookies = new Cookies();
+
+const userCookie = cookies.get("userSession")
+  ? cookies.get("userSession")
   : null;
 
 const initialState = {
-  userInfo: {},
-  userToken,
+  userInfo: { sessionID: userCookie },
   error: null,
   stompClient: null,
 };
@@ -30,7 +32,6 @@ export const userSlice = createSlice({
     },
     [userLogin.fulfilled]: (state, { payload }) => {
       state.userInfo = payload;
-      state.userToken = payload.userToken;
     },
     [userLogin.rejected]: (state, { payload }) => {
       state.error = payload;

@@ -46,8 +46,6 @@ export const userLogin = createAsyncThunk(
         { sessionID },
         config
       );
-      // store user's token in local storage
-      localStorage.setItem("userToken", data.userToken);
       return data;
     } catch (error) {
       if (error.response && error.response.data.message) {

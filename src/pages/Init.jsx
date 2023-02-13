@@ -13,15 +13,27 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerRoom } from "../features/room/roomActions";
 import { userLogin } from "../features/user/userActions";
+import { useCookies } from "react-cookie";
+import { useGetUserDetailsQuery } from "../services/userService";
+import { setCredentials } from "../features/user/userSlice";
 
 export const Init = () => {
+  const [cookies, setCookie] = useCookies(["userSession"]);
+
   const { roomInfo, error, success } = useSelector((state) => state.room);
   const { userInfo } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const { data: userData } = useGetUserDetailsQuery(
+    userInfo.sessionID || cookies.sessionID
+  );
 
   const [rName, setRName] = useState("");
   const [sessionID, setSessionID] = useState("");
   const navigate = useNavigate();
+
+  const timestamp = new Date().getTime();
+  const expiration = timestamp + 60 * 60 * 24 * 1000;
+  const expireDate = new Date(expiration);
 
   const handleCreate = (event) => {
     event.preventDefault();
@@ -41,7 +53,15 @@ export const Init = () => {
     const data = new FormData(event.currentTarget);
 
     dispatch(userLogin(data.get("sessionID")));
+    setCookie("userSession", data.get("sessionID"), {
+      path: "/",
+      maxAge: 86400,
+    });
   };
+
+  useEffect(() => {
+    if (userData) dispatch(setCredentials(userData));
+  }, [userData, dispatch]);
 
   useEffect(() => {
     if (success) {
@@ -51,8 +71,7 @@ export const Init = () => {
   });
 
   useEffect(() => {
-    //console.log(userInfo);
-    if (userInfo.sessionID) {
+    if (userInfo.room?.id) {
       navigate("room/" + userInfo.room.id + "/user");
     }
   }, [navigate, userInfo]);

@@ -10,30 +10,30 @@ import MailIcon from "@mui/icons-material/Mail";
 import { useDispatch, useSelector } from "react-redux";
 import { setUsers } from "../../features/users/usersSlice";
 import { useGetUsersQuery } from "../../services/userService";
+import { useCookies } from "react-cookie";
+import { useGetUserDetailsQuery } from "../../services/userService";
+import { setCredentials } from "../../features/user/userSlice";
 
 const UsersList = ({ setSelectedUser }) => {
+  const [cookies] = useCookies(["userSession"]);
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector((state) => state.user);
   const { users } = useSelector((state) => state.users);
+  const { data: userData } = useGetUserDetailsQuery(
+    userInfo.sessionID || cookies.sessionID
+  );
 
   const { data: usersData } = useGetUsersQuery({
-    roomID: userInfo.room.id,
-    sessionID: userInfo.sessionID,
+    roomID: userInfo.room?.id,
+    sessionID: userInfo?.sessionID,
   });
 
   useEffect(() => {
-    // console.log(userInfo);
-    // axios
-    //   .get(baseURL + `/${userInfo.room.id}/users`, {
-    //     params: {
-    //       sessionID: userInfo.sessionID,
-    //     },```
-    //   })
-    //   .then((res) => {
-    //     //console.log(res.data);
-    //     setUsers([...Object.entries(res.data)]);
-    //   });
+    if (userData) dispatch(setCredentials(userData));
+  }, [userData, dispatch]);
+
+  useEffect(() => {
     if (usersData) dispatch(setUsers([...Object.entries(usersData)]));
   }, [dispatch, usersData]);
 

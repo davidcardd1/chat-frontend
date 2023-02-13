@@ -29,6 +29,7 @@ import { resetUsers, statusChange } from "../../features/users/usersSlice";
 import { userStatus } from "../../features/user/userActions";
 import SockJS from "sockjs-client";
 import { over } from "stompjs";
+import { useCookies } from "react-cookie";
 
 const useStyles = makeStyles({
   table: {
@@ -53,6 +54,8 @@ const useStyles = makeStyles({
 
 let stompClient;
 const Chat = () => {
+  const [cookies, removeCookie] = useCookies(["userSession"]);
+
   const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -61,7 +64,9 @@ const Chat = () => {
   const [selectedUser, setSelectedUser] = useState("");
 
   const { userInfo } = useSelector((state) => state.user);
-  const { data: userData } = useGetUserDetailsQuery(userInfo.sessionID);
+  const { data: userData } = useGetUserDetailsQuery(
+    userInfo.sessionID || cookies.sessionID
+  );
 
   useEffect(() => {
     if (userData) dispatch(setCredentials(userData));
@@ -120,6 +125,7 @@ const Chat = () => {
     dispatch(logout());
     dispatch(resetMessages());
     dispatch(resetUsers());
+    removeCookie("userSession", { path: "/" });
     navigate("/ ");
   };
 
@@ -161,7 +167,7 @@ const Chat = () => {
                     />
                   </ListItemIcon>
                   <ListItemText
-                    primary={`Chat room: ${userInfo.room.name || " "}`}
+                    primary={`Chat room: ${userInfo.room?.name || " "}`}
                   ></ListItemText>
                 </ListItem>
               </List>
