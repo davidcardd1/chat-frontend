@@ -10,7 +10,6 @@ export const AppRoutes = () => {
     <Routes>
       <Route path={"*"} element={<NotFound />} />
       <Route path={"/"} element={<Init />} />
-      <Route path={"/room"} element={<Init />} />
       <Route path={"/room/:roomID"} element={<Room />} />
       <Route path={"/room/:roomID/user"} element={<Chat />} />
       <Route path={"/test"} element={<Chat />} />

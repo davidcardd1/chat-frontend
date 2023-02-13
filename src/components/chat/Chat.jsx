@@ -24,6 +24,8 @@ import UsersList from "../usersList/UsersList";
 import MessageList from "../messageList/MessageList";
 import { Box } from "@mui/system";
 import SendMessage from "../sendMessage/SendMessage";
+import { resetMessages } from "../../features/messages/messagesSlice";
+import { resetUnreads, resetUsers } from "../../features/users/usersSlice";
 
 const useStyles = makeStyles({
   table: {
@@ -68,6 +70,8 @@ const Chat = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(resetMessages());
+    dispatch(resetUsers());
     navigate("/ ");
   };
 
@@ -76,76 +80,82 @@ const Chat = () => {
   }, [selectedUser]);
 
   return (
-    <div style={{ width: "90%" }}>
-      <Grid container sx={{ flexDirection: "row" }}>
-        <Grid item xs={6} sx={{ display: "flex" }}>
-          <Typography variant="h5" className="header-message">
-            Chat
-          </Typography>
-        </Grid>
-        <Grid item xs={6} sx={{ display: "flex", justifyContent: "end" }}>
-          <Button onClick={handleLogout}>
-            <Typography variant="h5" className="header-message">
-              Logout
-            </Typography>
-          </Button>
-        </Grid>
-      </Grid>
-      <Grid
-        container
-        component={Paper}
-        className={classes.chatSection}
-        sx={{ height: "auto" }}
-      >
-        <Grid item xs={3} className={classes.borderRight500}>
-          <List>
-            <ListItem button key="RemySharp">
-              <ListItemIcon>
-                <Avatar
-                  alt="Group Chat"
-                  src="https://cdn-icons-png.flaticon.com/512/6387/6387947.png"
-                />
-              </ListItemIcon>
-              <ListItemText
-                primary={`Chat room: ${userInfo.room.name || " "}`}
-              ></ListItemText>
-            </ListItem>
-          </List>
-          <Divider />
-          <Grid item xs={12} style={{ padding: "10px" }}>
-            <List>
-              <ListItem key="You">
-                <ListItemText
-                  primary={`User: ${userInfo.nickname}`}
-                ></ListItemText>
-                <FormGroup>
-                  <FormControlLabel
-                    control={
-                      <Switch checked={status} onChange={onSwitchChange} />
-                    }
-                    label={status ? "online" : "offline"}
-                    labelPlacement="top"
-                  />
-                </FormGroup>
-              </ListItem>
-            </List>
+    <>
+      {userInfo?.sessionID != null ? (
+        <div style={{ width: "90%" }}>
+          <Grid container sx={{ flexDirection: "row" }}>
+            <Grid item xs={6} sx={{ display: "flex" }}>
+              <Typography variant="h5" className="header-message">
+                Chat
+              </Typography>
+            </Grid>
+            <Grid item xs={6} sx={{ display: "flex", justifyContent: "end" }}>
+              <Button onClick={handleLogout}>
+                <Typography variant="h5" className="header-message">
+                  Logout
+                </Typography>
+              </Button>
+            </Grid>
           </Grid>
-          <Divider />
-          <UsersList setSelectedUser={setSelectedUser} />
-        </Grid>
-        <Grid item xs={9}>
-          <Box>
-            <Typography variant="h3">- {selectedUser} -</Typography>
-          </Box>
-          <Divider />
-          <List className={classes.messageArea}>
-            <MessageList user={selectedUser} />
-          </List>
-          <Divider />
-          <SendMessage receiver={selectedUser} />
-        </Grid>
-      </Grid>
-    </div>
+          <Grid
+            container
+            component={Paper}
+            className={classes.chatSection}
+            sx={{ height: "auto" }}
+          >
+            <Grid item xs={3} className={classes.borderRight500}>
+              <List>
+                <ListItem button key="RemySharp">
+                  <ListItemIcon>
+                    <Avatar
+                      alt="Group Chat"
+                      src="https://cdn-icons-png.flaticon.com/512/6387/6387947.png"
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`Chat room: ${userInfo.room.name || " "}`}
+                  ></ListItemText>
+                </ListItem>
+              </List>
+              <Divider />
+              <Grid item xs={12} style={{ padding: "10px" }}>
+                <List>
+                  <ListItem key="You">
+                    <ListItemText
+                      primary={`User: ${userInfo.nickname}`}
+                    ></ListItemText>
+                    <FormGroup>
+                      <FormControlLabel
+                        control={
+                          <Switch checked={status} onChange={onSwitchChange} />
+                        }
+                        label={status ? "online" : "offline"}
+                        labelPlacement="top"
+                      />
+                    </FormGroup>
+                  </ListItem>
+                </List>
+              </Grid>
+              <Divider />
+              <UsersList setSelectedUser={setSelectedUser} />
+            </Grid>
+            <Grid item xs={9}>
+              <Box>
+                <Typography variant="h3">- {selectedUser} -</Typography>
+              </Box>
+              <Divider />
+              <List className={classes.messageArea}>
+                <MessageList user={selectedUser} />
+              </List>
+              <Divider />
+              <SendMessage receiver={selectedUser} />
+            </Grid>
+          </Grid>
+        </div>
+      ) : (
+        <>{handleLogout()}</>
+      )}
+    </>
   );
 };
 

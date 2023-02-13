@@ -30,9 +30,13 @@ export const usersSlice = createSlice({
         }
       });
     },
+    resetUsers: (state) => {
+      state.users = [];
+    },
   },
   extraReducers: {},
 });
 
-export const { setUsers, addUnread, resetUnreads } = usersSlice.actions;
+export const { setUsers, addUnread, resetUnreads, resetUsers } =
+  usersSlice.actions;
 export default usersSlice.reducer;
