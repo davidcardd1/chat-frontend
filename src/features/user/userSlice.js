@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { registerUser, userLogin } from "./userActions";
+import { registerUser, userLogin, userStatus } from "./userActions";
 
 const userToken = localStorage.getItem("userToken")
   ? localStorage.getItem("userToken")
@@ -44,6 +44,16 @@ export const userSlice = createSlice({
       state.userInfo = payload;
     },
     [registerUser.rejected]: (state, { payload }) => {
+      state.error = payload;
+    },
+    [userStatus.pending]: (state) => {
+      state.error = null;
+    },
+    [userStatus.fulfilled]: (state, { payload }) => {
+      state.success = true;
+      state.userInfo = payload;
+    },
+    [userStatus.rejected]: (state, { payload }) => {
       state.error = payload;
     },
   },

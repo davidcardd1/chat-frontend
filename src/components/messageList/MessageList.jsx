@@ -9,7 +9,6 @@ import {
   Typography,
   Container,
 } from "@mui/material";
-import axios from "axios";
 import { useRef } from "react";
 import { resetUnreads } from "../../features/users/usersSlice";
 
@@ -32,7 +31,7 @@ const MessageList = ({ user }) => {
   useEffect(() => {
     scrollToBottom();
     dispatch(resetUnreads(user));
-  }, [user, messages]);
+  }, [user, messages, dispatch]);
 
   useEffect(() => {
     // axios

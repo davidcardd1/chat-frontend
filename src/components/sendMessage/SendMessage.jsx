@@ -40,7 +40,10 @@ function SendMessage({ receiver }) {
 
     const onConnected = () => {
       //setUserData({ ...userData, connected: true });
-      //stompClient.subscribe("/chatroom/public", onMessageReceived);
+      stompClient.subscribe(
+        "/chatroom/public/" + userInfo.room.id,
+        onStatusReceived
+      );
       stompClient.subscribe(
         "/user/messages/" + userInfo.nickname,
         onPrivateMessage
@@ -60,8 +63,15 @@ function SendMessage({ receiver }) {
       }
     };
 
+    const onStatusReceived = (payload) => {
+      let msg = JSON.parse(payload.body);
+      if (msg.sender !== userInfo.nickname) {
+        console.log("RECEIVED: ", msg);
+      }
+    };
+
     if (stompClient == null) connect();
-  }, [receiver, userInfo.nickname]);
+  }, [receiver, userInfo.nickname, dispatch]);
 
   return (
     <Grid container style={{ padding: "20px" }}>

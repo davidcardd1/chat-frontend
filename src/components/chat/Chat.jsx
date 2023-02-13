@@ -25,7 +25,10 @@ import MessageList from "../messageList/MessageList";
 import { Box } from "@mui/system";
 import SendMessage from "../sendMessage/SendMessage";
 import { resetMessages } from "../../features/messages/messagesSlice";
-import { resetUnreads, resetUsers } from "../../features/users/usersSlice";
+import { resetUsers, statusChange } from "../../features/users/usersSlice";
+import { userStatus } from "../../features/user/userActions";
+import SockJS from "sockjs-client";
+import { over } from "stompjs";
 
 const useStyles = makeStyles({
   table: {
@@ -48,12 +51,13 @@ const useStyles = makeStyles({
   },
 });
 
+let stompClient;
 const Chat = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [status, setStatus] = useState(false);
+  const [status, setStatus] = useState(true);
   const [selectedUser, setSelectedUser] = useState("");
 
   const { userInfo } = useSelector((state) => state.user);
@@ -63,9 +67,53 @@ const Chat = () => {
     if (userData) dispatch(setCredentials(userData));
   }, [userData, dispatch]);
 
+  useEffect(() => {
+    const connect = () => {
+      let Sock = new SockJS("http://localhost:9090/chat");
+      stompClient = over(Sock);
+      stompClient.connect({}, onConnected, onError);
+    };
+
+    const onConnected = () => {
+      stompClient.subscribe(
+        "/chatroom/public/" + userInfo.room.id,
+        onStatusReceived
+      );
+    };
+
+    const onError = (err) => {
+      console.log(err);
+    };
+
+    const onStatusReceived = (payload) => {
+      let msg = JSON.parse(payload.body);
+      if (msg.sender !== userInfo.nickname) {
+        console.log("RECEIVED: ", msg);
+      }
+      dispatch(statusChange(msg));
+    };
+
+    if (stompClient == null) connect();
+  }, [userInfo.nickname, dispatch]);
+
   const onSwitchChange = (event) => {
-    event.preventDefault();
     setStatus(event.target.checked);
+    dispatch(
+      userStatus({
+        status: event.target.checked,
+        sessionID: userInfo.sessionID,
+      })
+    );
+    sendStatus();
+  };
+
+  const sendStatus = () => {
+    let msg = JSON.stringify({
+      body: !status,
+      sender: userInfo.nickname,
+    });
+
+    stompClient.send("/chatroom/public/" + userInfo.room.id, {}, msg);
   };
 
   const handleLogout = () => {

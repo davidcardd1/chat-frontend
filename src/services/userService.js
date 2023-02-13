@@ -13,6 +13,7 @@ export const userApi = createApi({
       }
     },
   }),
+  tagTypes: ["messages", "users"],
   endpoints: (builder) => ({
     getUserDetails: builder.query({
       query: (sessionID) => ({
@@ -35,16 +36,20 @@ export const userApi = createApi({
           params: { sessionID },
         };
       },
+      providesTags: ["messages"],
     }),
     getUsers: builder.query({
       query: (args) => {
         const { roomID, sessionID } = args;
+        console.log("REQUESTTTT");
         return {
           url: `/${roomID}/users`,
           method: "GET",
           params: { sessionID },
         };
       },
+      providesTags: ["users"],
+      invalidatesTags: ["messages"],
     }),
   }),
 });

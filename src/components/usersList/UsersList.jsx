@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   List,
   ListItem,
@@ -8,16 +8,14 @@ import {
 } from "@mui/material";
 import MailIcon from "@mui/icons-material/Mail";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import { setUsers } from "../../features/users/usersSlice";
 import { useGetUsersQuery } from "../../services/userService";
 
 const UsersList = ({ setSelectedUser }) => {
-  const baseURL = "http://localhost:9090";
   const dispatch = useDispatch();
 
   const { userInfo } = useSelector((state) => state.user);
-  const { users, status } = useSelector((state) => state.users);
+  const { users } = useSelector((state) => state.users);
 
   const { data: usersData } = useGetUsersQuery({
     roomID: userInfo.room.id,
@@ -30,7 +28,7 @@ const UsersList = ({ setSelectedUser }) => {
     //   .get(baseURL + `/${userInfo.room.id}/users`, {
     //     params: {
     //       sessionID: userInfo.sessionID,
-    //     },
+    //     },```
     //   })
     //   .then((res) => {
     //     //console.log(res.data);
@@ -51,17 +49,18 @@ const UsersList = ({ setSelectedUser }) => {
 
   return (
     <List sx={{ height: "30vw", overflowY: "auto" }}>
+      {console.log(users)}
       {users.length > 0 &&
         users.map((item) => (
           <ListItem button key={item} onClick={selectUser}>
             <ListItemIcon>
-              <Badge badgeContent={item[2]} color="primary">
+              <Badge badgeContent={item[1][1]} color="primary">
                 <MailIcon color="action" />
               </Badge>
             </ListItemIcon>
             <ListItemText primary={item[0]}>{item[0]}</ListItemText>
             <ListItemText
-              secondary={item[1] ? "online" : "offline"}
+              secondary={item[1][0] ? "online" : "offline"}
               align="end"
             ></ListItemText>
           </ListItem>

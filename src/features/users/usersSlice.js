@@ -9,34 +9,40 @@ export const usersSlice = createSlice({
   initialState,
   reducers: {
     setUsers: (state, { payload }) => {
-      payload.forEach((element) => {
-        element.push(0); // TODO: bring number from database
-        state.users.push(element);
-      });
+      state.users = payload;
     },
     addUnread: (state, { payload }) => {
       state.users.map((user) => {
-        if (user[0] == payload) {
+        if (user[0] === payload) {
           console.log("ADD UNREAD HERE", user, payload);
-          user[2] += 1;
+          user[1][1] += 1;
         }
       });
     },
     resetUnreads: (state, { payload }) => {
       state.users.map((user) => {
-        if (user[0] == payload) {
+        if (user[0] === payload) {
           console.log("RESET UNREAD HERE", user, payload);
-          user[2] = 0;
+          user[1][1] = 0;
         }
       });
     },
     resetUsers: (state) => {
       state.users = [];
     },
+    statusChange: (state, { payload }) => {
+      console.log(payload);
+      state.users.map((user) => {
+        if (user[0] === payload.sender) {
+          console.log("ADD UNREAD HERE", user, payload);
+          user[1][0] = payload.body;
+        }
+      });
+    },
   },
   extraReducers: {},
 });
 
-export const { setUsers, addUnread, resetUnreads, resetUsers } =
+export const { setUsers, addUnread, resetUnreads, resetUsers, statusChange } =
   usersSlice.actions;
 export default usersSlice.reducer;

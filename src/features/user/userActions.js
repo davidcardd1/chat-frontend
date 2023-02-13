@@ -58,3 +58,38 @@ export const userLogin = createAsyncThunk(
     }
   }
 );
+
+export const userStatus = createAsyncThunk(
+  "user/login",
+  async ({ status, sessionID }, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const { data } = await axios.put(
+        `${backendURL}/status`,
+        {
+          params: {
+            auth: sessionID,
+            status: status,
+          },
+        },
+        {
+          params: {
+            auth: sessionID,
+            status: status,
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
+  }
+);
