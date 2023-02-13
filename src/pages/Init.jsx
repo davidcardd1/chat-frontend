@@ -31,10 +31,6 @@ export const Init = () => {
   const [sessionID, setSessionID] = useState("");
   const navigate = useNavigate();
 
-  const timestamp = new Date().getTime();
-  const expiration = timestamp + 60 * 60 * 24 * 1000;
-  const expireDate = new Date(expiration);
-
   const handleCreate = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
